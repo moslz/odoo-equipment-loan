@@ -10,6 +10,7 @@
         'security/ir.model.access.csv',
         'views/equipment_item_views.xml',
         'views/equipment_loan_views.xml',
+        'views/res_partner_views.xml',
         'views/menus.xml',
     ],
     'application': True,
