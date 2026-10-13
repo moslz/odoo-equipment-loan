@@ -5,7 +5,7 @@
     'summary': 'Track equipment loans to contacts',
     'author': 'Mohammad Seyedalizadeh',
     'license': 'LGPL-3',
-    'depends': ['base'],
+    'depends': ['base', 'mail'],
     'data': [
         'security/security.xml',
         'security/ir.model.access.csv',

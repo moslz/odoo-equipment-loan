@@ -4,6 +4,7 @@ from odoo.exceptions import UserError, ValidationError
 
 class EquipmentLoan(models.Model):
     _name = 'equipment.loan'
+    _inherit = ['mail.thread']
     _description = 'Equipment Loan'
     _order = 'date_start desc, id desc'
 
@@ -12,19 +13,21 @@ class EquipmentLoan(models.Model):
         string='Equipment',
         required=True,
         ondelete='restrict',
+        tracking=True,
     )
     borrower_id = fields.Many2one(
         'res.partner',
         string='Borrower',
         required=True,
         ondelete='restrict',
+        tracking=True,
     )
     date_start = fields.Date(
         string='Loan Date',
         required=True,
         default=fields.Date.context_today,
     )
-    date_end = fields.Date(string='Due Date', required=True)
+    date_end = fields.Date(string='Due Date', required=True, tracking=True)
     return_date = fields.Date(string='Returned On', readonly=True, copy=False)
     state = fields.Selection(
         [
@@ -37,7 +40,9 @@ class EquipmentLoan(models.Model):
         required=True,
         readonly=True,
         copy=False,
+        tracking=True,
     )
+    is_overdue = fields.Boolean(compute='_compute_is_overdue')
     notes = fields.Text(string='Notes')
 
     @api.depends('equipment_id.name', 'borrower_id.name')
@@ -45,6 +50,16 @@ class EquipmentLoan(models.Model):
         for loan in self:
             parts = [loan.equipment_id.name, loan.borrower_id.name]
             loan.display_name = ' - '.join(filter(None, parts))
+
+    @api.depends('state', 'date_end')
+    def _compute_is_overdue(self):
+        today = fields.Date.context_today(self)
+        for loan in self:
+            loan.is_overdue = (
+                loan.state == 'borrowed'
+                and bool(loan.date_end)
+                and loan.date_end < today
+            )
 
     @api.constrains('date_start', 'date_end')
     def _check_dates(self):
