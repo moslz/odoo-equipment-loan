@@ -18,6 +18,9 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <field name="active" invisible="1"/>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger"
+                            invisible="active"/>
                     <group>
                         <field name="name"/>
                         <field name="notes"/>
@@ -31,6 +34,9 @@
         <field name="name">Equipment</field>
         <field name="res_model">equipment.item</field>
         <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Add your first equipment item</p>
+        </field>
     </record>
 
 </odoo>

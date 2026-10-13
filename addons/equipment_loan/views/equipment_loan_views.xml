@@ -5,12 +5,17 @@
         <field name="name">equipment.loan.list</field>
         <field name="model">equipment.loan</field>
         <field name="arch" type="xml">
-            <list decoration-muted="state == 'returned'">
+            <list decoration-danger="is_overdue" decoration-muted="state == 'returned'">
+                <field name="is_overdue" column_invisible="True"/>
                 <field name="equipment_id"/>
-                <field name="borrower_id"/>
+                <field name="borrower_id" widget="many2one_avatar"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
-                <field name="state"/>
+                <field name="return_date" optional="hide"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state == 'borrowed'"
+                       decoration-success="state == 'returned'"/>
             </list>
         </field>
     </record>
@@ -28,10 +33,13 @@
                     <field name="state" widget="statusbar"/>
                 </header>
                 <sheet>
+                    <field name="is_overdue" invisible="1"/>
+                    <widget name="web_ribbon" title="Overdue" bg_color="text-bg-danger"
+                            invisible="not is_overdue"/>
                     <group>
                         <group>
                             <field name="equipment_id"/>
-                            <field name="borrower_id"/>
+                            <field name="borrower_id" widget="many2one_avatar"/>
                         </group>
                         <group>
                             <field name="date_start"/>
@@ -39,8 +47,9 @@
                             <field name="return_date" invisible="state != 'returned'"/>
                         </group>
                     </group>
-                    <field name="notes"/>
+                    <field name="notes" placeholder="Condition, accessories, remarks..."/>
                 </sheet>
+                <chatter/>
             </form>
         </field>
     </record>
@@ -54,6 +63,9 @@
                 <field name="borrower_id"/>
                 <filter name="filter_borrowed" string="Borrowed"
                         domain="[('state', '=', 'borrowed')]"/>
+                <filter name="filter_overdue" string="Overdue"
+                        domain="[('state', '=', 'borrowed'), ('date_end', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <separator/>
                 <filter name="group_state" string="Status"
                         context="{'group_by': 'state'}"/>
             </search>
@@ -64,6 +76,9 @@
         <field name="name">Loans</field>
         <field name="res_model">equipment.loan</field>
         <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first equipment loan</p>
+        </field>
     </record>
 
 </odoo>
