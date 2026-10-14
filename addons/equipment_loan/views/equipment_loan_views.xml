@@ -11,7 +11,7 @@
                 <field name="borrower_id" widget="many2one_avatar"/>
                 <field name="date_start"/>
                 <field name="date_end"/>
-                <field name="return_date" optional="hide"/>
+                <field name="returned_at" optional="show" options="{'show_seconds': False}"/>
                 <field name="state" widget="badge"
                        decoration-info="state == 'draft'"
                        decoration-warning="state == 'borrowed'"
@@ -44,7 +44,7 @@
                         <group>
                             <field name="date_start"/>
                             <field name="date_end"/>
-                            <field name="return_date" invisible="state != 'returned'"/>
+                            <field name="returned_at" invisible="state != 'returned'" options="{'show_seconds': False}"/>
                         </group>
                     </group>
                     <field name="notes" placeholder="Condition, accessories, remarks..."/>

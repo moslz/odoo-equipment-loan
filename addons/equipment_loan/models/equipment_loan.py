@@ -28,7 +28,8 @@ class EquipmentLoan(models.Model):
         default=fields.Date.context_today,
     )
     date_end = fields.Date(string='Due Date', required=True, tracking=True)
-    return_date = fields.Date(string='Returned On', readonly=True, copy=False)
+
+    returned_at = fields.Datetime(string='Returned At',readonly=True, copy=False,tracking=True,)
     state = fields.Selection(
         [
             ('draft', 'Draft'),
@@ -99,5 +100,5 @@ class EquipmentLoan(models.Model):
                 raise UserError(_('Only borrowed loans can be returned.'))
         self.write({
             'state': 'returned',
-            'return_date': fields.Date.context_today(self),
+            'returned_at': fields.Datetime.now(),
         })
