@@ -29,7 +29,7 @@ class EquipmentLoan(models.Model):
     )
     date_end = fields.Date(string='Due Date', required=True, tracking=True)
 
-    returned_at = fields.Datetime(string='Returned At',readonly=True, copy=False,tracking=True,)
+    returned_at = fields.Datetime(string='Returned At', readonly=True, copy=False, tracking=True, )
     state = fields.Selection(
         [
             ('draft', 'Draft'),
