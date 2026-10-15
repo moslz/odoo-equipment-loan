@@ -70,23 +70,16 @@ The `.env` file holds the database credentials and isn't committed. Copy the tem
 Copy-Item .env.example .env        # Linux/macOS: cp .env.example .env
 ```
 
-Open `.env` and set `POSTGRES_PASSWORD` to any value. `ODOO_PORT` is the port Odoo
-will use (default 8069).
+For a local test you don't need to change anything in it. The default password works.
+You can set your own `POSTGRES_PASSWORD`, or change `ODOO_PORT` if 8069 is already taken.
 
-**3. Create the database and install the module**
-
-```
-docker compose run --rm odoo odoo -d odoo_dev -i equipment_loan --stop-after-init
-```
-
-This downloads the images on the first run, creates the database `odoo_dev` and installs
-the module. It takes a minute the first time. 
-
-**4. Start Odoo**
+**3. Start Odoo**
 
 ```
 docker compose up -d
 ```
+The first start downloads the images, creates the database `odoo_dev` and installs
+the module. This takes about 2 minutes.
 
 Open http://localhost:8069 and log in with `admin` / `admin`. "Equipment Loans" is in the
 main menu.
@@ -94,19 +87,25 @@ main menu.
 To stop it: `docker compose stop`. To remove everything including the database:
 `docker compose down -v`.
 
+If you get a database password error, a volume from an earlier run still exists.
+Run `docker compose down -v` and do the step 3 again.
+
 ## Tests
+
+Odoo has to be running (step 3). There is only one database, `odoo_dev`. The module
+tests are rolled back after each test, so your data stays untouched.
 
 ### Module tests (37 tests)
 
-They use Odoo's own test framework and run inside Docker, in a separate database so
-your data isn't touched:
+They use Odoo's own test framework and run inside Docker. 
+
+The tests run on the same database on default for simplicity.
 
 ```
-docker compose run --rm odoo odoo -d odoo_test -i equipment_loan --test-enable --test-tags /equipment_loan --stop-after-init
+docker compose run --rm odoo odoo -d odoo_dev -u equipment_loan --test-enable --test-tags /equipment_loan --stop-after-init
 ```
 
-For later runs, replace `-i` with `-u`. The last lines of the output should say
-`0 failed, 0 error(s) of 37 tests`.
+The last lines of the output should say `0 failed, 0 error(s) of 37 tests`.
 
 ### End-to-end tests (4 tests, pytest + Playwright)
 
@@ -122,15 +121,13 @@ pytest -v
 
 Expected: `4 passed`. Add `--headed` to watch the browser.
 
-The tests log in as `admin` / `admin`. If your setup is different, set these environment
-variables before running pytest (PowerShell: `$env:ODOO_LOGIN="..."`):
+The tests log in as `admin` / `admin` and create their own test data. If your login is
+different, set these environment variables before running pytest
+(PowerShell: `$env:ODOO_LOGIN="..."`):
 
 - `ODOO_LOGIN`, `ODOO_PASSWORD`: login (default `admin` / `admin`)
 - `ODOO_URL`: default `http://localhost:8069`
-- `ODOO_DB`: only needed if there is more than one database, e.g. after running the
-  module tests, which create `odoo_test`. Then set it to `odoo_dev`.
 - `ODOO_DATE_FORMAT`: default `%m/%d/%Y`, which matches English (US)
-
 ### Code style
 
 ```

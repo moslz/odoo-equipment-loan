@@ -10,6 +10,8 @@ services:
 
   odoo:
     image: odoo:19.0
+    command: odoo -d odoo_dev -i equipment_loan
+    restart: on-failure
     depends_on:
       - db
     ports:
